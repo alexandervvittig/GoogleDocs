@@ -1,0 +1,69 @@
+// Alex Wittig (alexanderwittig@gmail.com)
+
+// Get template from Google Docs and name it
+var docTemplate = "$GoogleDocID";  // this is what you want to change for your version
+var docName     = "Form";
+
+// When Form Gets submitted
+function onFormSubmit(e) {
+  
+//Get information from form and set our variables
+  
+  var email_address = "alexanderwittig@gmail.com"; // People who should get PDF
+  var full_name = e.values[1];
+  var e_mail = e.values[2];
+  var ename = e.values[3];
+  var eaddress = e.values[4];
+  var ecell = e.values[5];  
+  var adob = e.values[6];
+  var company = e.values[7];
+  var start = e.values[8];
+  var title = e.values[9];
+  var driver = e.values[10];
+  var adriver = e.values[11];
+  var equipment = e.values[12];
+  var odate = e.values[13];
+  var anotes = e.values[14];
+  
+// Get document template, copy it as a new temp doc, and save the Doc’s id
+   var copyId = DriveApp.getFileById(docTemplate)
+                .makeCopy(docName+' for '+ename)
+                .getId();
+  
+// Open the temporary document
+   var copyDoc = DocumentApp.openById(copyId);
+  
+// Get the document’s body section
+   var copyBody = copyDoc.getActiveSection();
+  
+// Replace place holder keys,in our google doc template  
+  copyBody.replaceText('keyfullname', full_name);
+  copyBody.replaceText('keyemail', e_mail);
+  copyBody.replaceText('keyname', ename);
+  copyBody.replaceText('keyaddress', eaddress);
+  copyBody.replaceText('keycell', ecell);
+  copyBody.replaceText('keydob', adob);
+  copyBody.replaceText('keycompany', company);
+  copyBody.replaceText('keystart', start);
+  copyBody.replaceText('keytitle', title);
+  copyBody.replaceText('keydriver', driver);
+  copyBody.replaceText('keyadriver', adriver);
+  copyBody.replaceText('keyequip', equipment);
+  copyBody.replaceText('keyorient', odate);
+  copyBody.replaceText('keynotes', anotes);
+  
+  
+// Save and close the temporary document
+   copyDoc.saveAndClose();
+  
+// Convert document to PDF
+   var pdf = DriveApp.getFileById(copyId).getAs("application/pdf"); 
+  
+// Attach PDF and send the email
+   var subject = "Test " + ename;
+   var body    = "Form";
+      MailApp.sendEmail(email_address, subject, body, {htmlBody: body, attachments: pdf}); 
+  
+// Delete temp file
+   DriveApp.getFileById(copyId).setTrashed(true);
+}
